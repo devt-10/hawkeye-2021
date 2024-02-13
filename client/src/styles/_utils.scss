@@ -1,0 +1,132 @@
+.screen-center{
+    height: 100vh;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background: #141414;
+
+    video{
+        transform: scale(2);
+    }
+}
+
+.input{
+    color: #fff;
+    box-shadow: 0px 4px 4px 0px #00000040;
+    background: linear-gradient(112.11deg, rgba(255, 255, 255, 0.09) 12.41%, rgba(255, 255, 255, 0.05) 84.54%);
+box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+backdrop-filter: blur(30px);
+border-radius: 4px;
+width: 100%;
+font-size: 1.25rem;
+padding: 1rem 1.5rem ;
+display: block;
+border-bottom: 1px solid transparent;
+transition: all .1s;
+
+@-moz-document url-prefix() {
+    background-color: #000000;
+    background: linear-gradient(135deg, #000000 0%, #414141 180%);
+  }  
+
+&:focus{
+    border-bottom: 1px solid #585FFF;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+
+
+}
+}
+
+
+.input-container{
+    color: #fff;
+
+    position: relative;
+    width: 44rem;
+    margin: auto;
+    max-width: 90%;
+
+    input{
+        caret-color: #585FFF;
+    }
+
+   
+
+
+    i {
+        position: absolute;
+        top: 50%;
+        right: 1.5rem;
+        transform: translateY(-50%);
+        z-index: 4;
+        cursor: pointer;
+        color: #fff;
+      }
+}
+
+.primary-btn{
+    color: #fefefe !important; 
+    position: relative;
+    width: max-content;
+    cursor: pointer;
+    background-color: transparent;
+    font-weight: bold;
+    height: 3rem;
+
+
+
+
+    &--hovered {
+        
+    }
+
+
+
+    img{
+        width: 12rem;
+        height: 95%;
+
+    }
+
+    .name{
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%,-64%);
+font-size: 1rem;
+
+
+@media not all and (min-resolution:.001dpcm)
+{ @supports (-webkit-appearance:none) {
+
+    font-size: .8rem;
+
+}}
+
+
+
+
+@media not all and (min-resolution:.001dpcm)
+{ @supports (-webkit-appearance:none) and (stroke-color:transparent) {
+
+    font-size: .8rem
+   
+}}
+
+@media not all and (min-resolution:.001dpcm)
+{ @supports (-webkit-appearance:none) and (not (stroke-color:transparent)) {
+
+    font-size: .8rem
+
+}}
+
+@supports (-webkit-hyphens:none)
+{
+    font-size: .8rem
+
+
+}
+
+    }
+}

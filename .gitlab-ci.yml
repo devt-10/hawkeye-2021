@@ -1,0 +1,130 @@
+# This file is a template, and might need editing before it works on your project.
+# Build a Docker image with CI/CD and push to the GitLab registry.
+# Docker-in-Docker documentation: https://docs.gitlab.com/ee/ci/docker/using_docker_build.html
+#
+# This template uses one generic job with conditional builds
+# for the default branch and all other (MR) branches.
+stages:
+  - build
+  - deploy
+
+# test-build:
+#   tags:
+#     - docker
+#   stage: build
+#   image: tmaier/docker-compose:latest
+#   services:
+#     - docker:dind
+#   script:
+#     - docker ps
+#     - docker-compose -f docker/docker-compose.prod.yml down
+
+build client:
+  # Use the official docker image
+  image: tmaier/docker-compose:latest
+  tags:
+    - docker
+  stage: build
+  only:
+    changes:
+      - client/**/*
+    refs:
+      - prod
+
+  services:
+    - docker:dind
+
+  before_script:
+    - echo "$CI_REG_TOKEN" | docker login --username "$CI_REG_USERNAME" --password-stdin $CI_REGISTRY
+
+  script:
+    - cd client && docker build -t registry.gitlab.com/iecse-manipal/board-20/prometheus-21/hawkeye-2021/hawk-client:latest -f client.prod.Dockerfile .
+    - docker push registry.gitlab.com/iecse-manipal/board-20/prometheus-21/hawkeye-2021/hawk-client:latest
+
+  after_script:
+    - docker logout $CI_REGISTRY
+
+build api:
+  # Use the official docker image.
+  image: tmaier/docker-compose:latest
+  tags:
+    - docker
+  stage: build
+  only:
+    changes:
+      - api/**/*
+    refs:
+      - prod
+
+  services:
+    - docker:dind
+
+  before_script:
+    - echo "$CI_REG_TOKEN" | docker login --username "$CI_REG_USERNAME" --password-stdin $CI_REGISTRY
+  script:
+    - cd api && docker build -t registry.gitlab.com/iecse-manipal/board-20/prometheus-21/hawkeye-2021/hawk-api:latest -f api.prod.Dockerfile .
+    - docker push registry.gitlab.com/iecse-manipal/board-20/prometheus-21/hawkeye-2021/hawk-api:latest
+
+deploy api:
+  stage: deploy
+  only:
+    changes:
+      - api/**/*
+    refs:
+      - prod
+  tags:
+    - shell
+  before_script:
+    - echo "$CI_REG_TOKEN" | sudo docker login --username "$CI_REG_USERNAME" --password-stdin $CI_REGISTRY
+  script:
+    - ./deploy/api-deploy.sh
+  after_script:
+    - docker logout $CI_REGISTRY
+  when: manual
+
+deploy client:
+  stage: deploy
+  only:
+    changes:
+      - client/**/*
+    refs:
+      - prod
+  tags:
+    - shell
+  before_script:
+    - echo "$CI_REG_TOKEN" | sudo docker login --username "$CI_REG_USERNAME" --password-stdin $CI_REGISTRY
+  script:
+    - ./deploy/client-deploy.sh
+  after_script:
+    - docker logout $CI_REGISTRY
+  when: manual
+
+deploy docker:
+  stage: deploy
+  only:
+    changes:
+      - docker/docker-compose.prod.yml
+    refs:
+      - prod
+  tags:
+    - shell
+  before_script:
+    - echo "$CI_REG_TOKEN" | sudo docker login --username "$CI_REG_USERNAME" --password-stdin $CI_REGISTRY
+  script:
+    - sudo docker-compose -f docker/docker-compose.prod.yml up -d
+  after_script:
+    - docker logout $CI_REGISTRY
+  when: manual
+
+# deploy shell changes:
+#   stage: deploy
+#   only:
+#     changes:
+#       - deploy/**/*
+#     refs:
+#       - prod
+#   tags:
+#     - shell
+#   script:
+#     - git pull origin prod
+#   when: manual
